@@ -2,7 +2,7 @@
 
 ## Install with a coding agent
 
-Send this message to Claude Code, Codex, or any coding agent that can access the web and run Windows PowerShell:
+Send this message to GitHub Copilot, Claude Code, Codex, or any coding agent that can access the web and run Windows PowerShell:
 
 ```text
 按照这个网址安装或升级 Cortana：
