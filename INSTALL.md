@@ -17,4 +17,12 @@ irm https://raw.githubusercontent.com/daizw/cortana-install/main/install.ps1 | i
 code --list-extensions --show-versions | Select-String '^microsoft-cortana\.cortana-work-assistant@'
 ```
 
+6. Tell the user to reload Visual Studio Code, open Cortana chat, and send:
+
+```text
+Use $cortana-onboarding to finish setting up Cortana on this machine.
+```
+
+The onboarding skill completes model, identity, communication-style, guardrail, service, memory, PWA, and optional integration setup while preserving existing configuration. If `$cortana-onboarding` is unavailable after reload, the installed Cortana release does not contain the skill yet; report that the user must install a release that includes it.
+
 The installer installs Cortana when missing, upgrades an older version, skips the current version, and does not downgrade a newer local build. If a command fails, report the exact failure and the action required from the user.

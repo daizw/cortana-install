@@ -9,7 +9,7 @@ Send this message to GitHub Copilot, Claude Code, Codex, or any coding agent tha
 https://raw.githubusercontent.com/daizw/cortana-install/main/INSTALL.md
 ```
 
-The agent will open the corporate GitHub repository for sign-in, run the installer, and verify the installed Cortana version.
+The agent will open the corporate GitHub repository for sign-in, run the installer, verify the installed Cortana version, and hand off to the guided `$cortana-onboarding` skill after VS Code reloads.
 
 ## Install directly
 
