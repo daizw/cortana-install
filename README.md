@@ -1,5 +1,18 @@
 # Cortana installer
 
+## Install with Claude Code
+
+Send Claude Code this message:
+
+```text
+按照这个网址安装或升级 Cortana：
+https://raw.githubusercontent.com/daizw/cortana-install/main/INSTALL.md
+```
+
+Claude Code will open the corporate GitHub repository for sign-in, run the installer, and verify the installed Cortana version.
+
+## Install directly
+
 Install or upgrade Cortana Work Assistant on Windows from PowerShell:
 
 ```powershell
