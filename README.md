@@ -12,6 +12,7 @@ The bootstrap installer:
 - opens GitHub browser sign-in when authentication is required;
 - downloads the latest Cortana VSIX from `gim-home/vswork-dist`;
 - verifies the VSIX against the SHA-256 digest in the GitHub release;
-- installs or upgrades the Cortana VS Code extension.
+- installs Cortana when missing or upgrades an older version;
+- skips an identical version and never downgrades a newer local build.
 
 The signed-in GitHub account must have access to `gim-home/vswork-dist`. No credentials or tokens are stored in this repository.

@@ -77,6 +77,22 @@ function Install-WinGetPackage {
     Refresh-ProcessPath
 }
 
+function ConvertTo-ComparableVersion {
+    param(
+        [string]$Value,
+        [string]$Description
+    )
+
+    $normalized = $Value.Trim() -replace '^[vV]', ''
+    $normalized = ($normalized -split '[-+]')[0]
+    try {
+        return [Version]$normalized
+    }
+    catch {
+        throw "Cannot compare the $Description version '$Value'."
+    }
+}
+
 if ([Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
     throw 'This installer currently supports Windows only.'
 }
@@ -147,7 +163,16 @@ try {
     Write-Step 'Finding the latest Cortana release'
     $releaseJson = & $gh api "repos/$distributionRepository/releases/latest"
     if ($LASTEXITCODE -ne 0) {
-        throw "Cannot access $distributionRepository. Confirm that the signed-in GitHub account has access."
+        $account = (& $gh api user --jq '.login' 2>$null)
+        $accountHint = if ($LASTEXITCODE -eq 0 -and $account) {
+            "The active GitHub account is '$account'. "
+        } else {
+            ''
+        }
+        throw (
+            "Cannot access $distributionRepository. $accountHint" +
+            "Use an account with repository access. If another account is already configured, run 'gh auth switch --hostname github.com'; otherwise run 'gh auth login --hostname github.com --web'."
+        )
     }
     $release = $releaseJson | ConvertFrom-Json
     $vsixAssets = @(
@@ -157,8 +182,38 @@ try {
         throw "Expected exactly one cortana-agent-*.vsix asset in release $($release.tag_name), but found $($vsixAssets.Count)."
     }
     $asset = $vsixAssets[0]
+    $latestVersion = ConvertTo-ComparableVersion $release.tag_name 'latest release'
     Write-Host "    Release: $($release.tag_name)" -ForegroundColor DarkGray
     Write-Host "    Package: $($asset.name)" -ForegroundColor DarkGray
+
+    Write-Step 'Checking the installed Cortana version'
+    $installedExtensionLines = @(& $code --list-extensions --show-versions)
+    if ($LASTEXITCODE -ne 0) {
+        throw 'VS Code failed to list installed extensions.'
+    }
+    $installedLine = $installedExtensionLines | Where-Object {
+        $_ -match ('^' + [Regex]::Escape($extensionId) + '@(.+)$')
+    } | Select-Object -First 1
+
+    if ($installedLine) {
+        $installedVersionText = $installedLine.Substring($extensionId.Length + 1)
+        $installedVersion = ConvertTo-ComparableVersion $installedVersionText 'installed Cortana'
+        Write-Host "    Installed: $installedVersionText" -ForegroundColor DarkGray
+
+        if ($installedVersion -eq $latestVersion) {
+            Write-Host "`nCortana $installedVersionText is already the latest version. Nothing to do." -ForegroundColor Green
+            return
+        }
+        if ($installedVersion -gt $latestVersion) {
+            Write-Host "`nCortana $installedVersionText is newer than the latest release $($release.tag_name). It was left unchanged." -ForegroundColor Yellow
+            return
+        }
+
+        Write-Host "    Action: upgrade $installedVersionText -> $($release.tag_name)" -ForegroundColor DarkGray
+    } else {
+        Write-Host '    Installed: not found' -ForegroundColor DarkGray
+        Write-Host "    Action: install $($release.tag_name)" -ForegroundColor DarkGray
+    }
 
     New-Item -ItemType Directory -Path $temporaryDirectory -Force | Out-Null
     $vsixPath = Join-Path $temporaryDirectory $asset.name
@@ -193,9 +248,10 @@ try {
         '--install-extension', $vsixPath, '--force'
     ) 'VS Code failed to install Cortana'
 
-    $installedExtensions = @(& $code --list-extensions)
-    if ($LASTEXITCODE -ne 0 -or $installedExtensions -notcontains $extensionId) {
-        throw "VS Code did not report $extensionId as installed."
+    $installedExtensions = @(& $code --list-extensions --show-versions)
+    $expectedInstalledLine = "${extensionId}@$latestVersion"
+    if ($LASTEXITCODE -ne 0 -or $installedExtensions -notcontains $expectedInstalledLine) {
+        throw "VS Code did not report $expectedInstalledLine as installed."
     }
 
     Write-Host "`nCortana installed successfully." -ForegroundColor Green
