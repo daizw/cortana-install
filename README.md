@@ -1,15 +1,15 @@
 # Cortana installer
 
-## Install with Claude Code
+## Install with a coding agent
 
-Send Claude Code this message:
+Send this message to Claude Code, Codex, or any coding agent that can access the web and run Windows PowerShell:
 
 ```text
 按照这个网址安装或升级 Cortana：
 https://raw.githubusercontent.com/daizw/cortana-install/main/INSTALL.md
 ```
 
-Claude Code will open the corporate GitHub repository for sign-in, run the installer, and verify the installed Cortana version.
+The agent will open the corporate GitHub repository for sign-in, run the installer, and verify the installed Cortana version.
 
 ## Install directly
 

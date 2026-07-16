@@ -1,6 +1,6 @@
 # Install or upgrade Cortana
 
-Follow these instructions on Windows.
+These instructions are for any coding agent that can access the web and run Windows PowerShell. Follow them on Windows.
 
 1. Open <https://github.com/gim-home/vswork-dist> in the user's default browser.
 2. Ask the user to sign in with their corporate GitHub account and wait until they confirm the repository is accessible. This must happen before GitHub CLI authorization so it does not select a personal GitHub account.
