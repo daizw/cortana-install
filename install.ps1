@@ -1,4 +1,17 @@
 # Cortana Work Assistant bootstrap installer for Windows.
+#
+# Purpose:
+#   Installs or upgrades the Cortana Visual Studio Code extension (.vsix) from an
+#   internal GitHub release. It does not modify system settings, install services,
+#   touch the registry, or access user data beyond GitHub authentication.
+#
+# Security scope:
+#   Reads   - GitHub release metadata and the release .vsix asset.
+#   Writes  - the VS Code extensions directory only.
+#   Network - github.com only (WinGet installs VS Code / GitHub CLI only if missing).
+#   Verify  - the .vsix is checked against the SHA-256 digest in the GitHub release.
+#   Privs   - no elevation required.
+#
 # Usage:
 #   irm https://raw.githubusercontent.com/daizw/cortana-install/main/install.ps1 | iex
 
